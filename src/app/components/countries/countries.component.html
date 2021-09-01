@@ -1,15 +1,52 @@
 <div class="jumbotron bg-white text-center">
-    <h1 class="display-4">Corona Covid-19 Tracker Country Wise</h1>
-    <hr>
+  <h1 class="display-4">Corona Covid-19 Tracker Country Wise</h1>
+  <hr />
 
-    <div class="mx-auto">
-        <div class="form-group col-lg-5 mx-auto">
-            <label for="c"> Select Country  </label> <br>
-            <select name="" class="from-control" id="c" #input (change)='updateValue(input.value)'>
-                <option value="{{ con }}" *ngFor='let con of countries'>{{ con | titlecase }}</option>
-            </select>
-        </div>
+  <div class="mx-auto">
+    <div class="form-group col-lg-5 mx-auto">
+      <label for="c"> Select Country </label> <br />
+      <select
+        name=""
+        class="from-control"
+        id="c"
+        #input
+        (change)="updateValue(input.value)"
+      >
+        <option value="{{ con }}" *ngFor="let con of countries">
+          {{ con | titlecase }}
+        </option>
+      </select>
     </div>
-    <app-dashboard-card [totalActive]="totalActive" [totalConfirmed]="totalConfirmed" [totalDeaths]="totalDeaths" [totalRecovered]="totalRecovered"></app-dashboard-card>
+  </div>
+  <app-dashboard-card
+    [totalActive]="totalActive"
+    [totalConfirmed]="totalConfirmed"
+    [totalDeaths]="totalDeaths"
+    [totalRecovered]="totalRecovered"
+  ></app-dashboard-card>
 
-</div> 
+  <div class="card row">
+    <div class="col-lg-6">
+      <table class="table ">
+        <thead>
+          <tr>
+            <th>Sno.</th>
+            <th>Date</th>
+            <th>Cases</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let info of selectedCountryData; index as i">
+            <td>{{ i + 1 }}</td>
+            <td>{{ info.date | date }}</td>
+            <td>{{ info.cases }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="col-lg-6">
+      <!-- <google-chart [data]="lineChart"></google-chart> -->
+    </div>
+  </div>
+</div>
