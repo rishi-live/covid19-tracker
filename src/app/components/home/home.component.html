@@ -1,9 +1,13 @@
-<div class="jumbotron bg-white text-center">
-    <h1 class="display-4">Corona Covid-19 Tracker</h1>
-    <hr>
+<div class="ui inverted dimmer" [class.active]="loading">
+  <div class="ui text loader">Loading</div>
+</div>
 
-    <app-dashboard-card [totalActive]="totalActive" [totalConfirmed]="totalConfirmed"
-        [totalDeaths]="totalDeaths" [totalRecovered]="totalRecovered"></app-dashboard-card>
+<div class="jumbotron bg-white text-center">
+  <h1 class="display-4">Corona Covid-19 Tracker</h1>
+  <hr>
+
+  <app-dashboard-card [totalActive]="totalActive" [totalConfirmed]="totalConfirmed"
+    [totalDeaths]="totalDeaths" [totalRecovered]="totalRecovered"></app-dashboard-card>
 </div>
 <hr>
 <div class="ui form">
@@ -11,25 +15,29 @@
     <label for="caseType">Select Case Type : </label>
     <div class="field">
       <div class="ui radio checkbox">
-        <input type="radio" name="caseType" value="c" id="c" #c (click)='updateChart(c)' checked="" tabindex="0" class="hidden">
+        <input type="radio" name="caseType" value="c" id="c" #c (click)='updateChart(c)' checked=""
+          tabindex="0" class="hidden">
         <label for="c">Confirmed</label>
       </div>
     </div>
     <div class="field">
       <div class="ui radio checkbox">
-        <input type="radio" value="d" id="d" #d (click)='updateChart(d)' name="caseType" tabindex="0" class="hidden">
+        <input type="radio" value="d" id="d" #d (click)='updateChart(d)' name="caseType"
+          tabindex="0" class="hidden">
         <label for="d">Deaths</label>
       </div>
     </div>
     <div class="field">
       <div class="ui radio checkbox">
-        <input type="radio" value="r" id="r" #r (click)='updateChart(r)' name="caseType" tabindex="0" class="hidden">
+        <input type="radio" value="r" id="r" #r (click)='updateChart(r)' name="caseType"
+          tabindex="0" class="hidden">
         <label for="r">Recovered</label>
       </div>
     </div>
     <div class="field">
       <div class="ui radio checkbox">
-        <input type="radio" value="a" id="a" #a (click)='updateChart(a)' name="caseType" tabindex="0" class="hidden">
+        <input type="radio" value="a" id="a" #a (click)='updateChart(a)' name="caseType"
+          tabindex="0" class="hidden">
         <label for="a">Active</label>
       </div>
     </div>
@@ -37,12 +45,16 @@
 </div>
 
 <div class="row">
-    <div class="col-lg-6 col-md-6">
-        <google-chart [data]="pieChart"></google-chart>
-
-    </div>
-    <div class="col-lg-6 col-md-6">
-        <google-chart [data]="columnChart"></google-chart>
-
-    </div>
+  <div class="col-lg-6">
+    <google-chart [type]='chart.PieChart' [options]='chart.options' style="width: 100%;"
+      [height]='chart.height' [data]='datatable'></google-chart>
+  </div>
+  <div class="col-lg-6">
+    <google-chart [type]='chart.ColumnChart' style="width: 100%;" [options]='chart.options'
+      [height]='chart.height' [data]='datatable'></google-chart>
+  </div>
+  <!-- 
+        <div class="col">
+            <google-chart [type]='chart.LineChart' style="width: 100%;" [options]='chart.options' [height]='chart.height' [data]='datatable'></google-chart>
+        </div> -->
 </div>

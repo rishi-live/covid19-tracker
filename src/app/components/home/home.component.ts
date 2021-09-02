@@ -13,13 +13,29 @@ export class HomeComponent implements OnInit {
   totalActive = 0;
   totalDeaths = 0;
   totalRecovered = 0;
+  loading = true;
+  datatable = [];
   globalData: GlobalDataSummary[];
-  pieChart: GoogleChartInterface = {
-    chartType: "PieChart",
-  };
-  columnChart: GoogleChartInterface = {
-    chartType: "ColumnChart",
-  };
+  chart = {
+    PieChart: "PieChart",
+    ColumnChart: 'ColumnChart',
+    LineChart: "LineChart",
+    height: 500,
+    options: {
+      animation: {
+        duration: 1000,
+        easing: 'out',
+      },
+      is3D: true
+    }
+  }
+
+  // pieChart: GoogleChartInterface = {
+  //   chartType: "PieChart",
+  // };
+  // columnChart: GoogleChartInterface = {
+  //   chartType: "ColumnChart",
+  // };
   constructor(private dataService: DataServiceService) {}
 
   ngOnInit(): void {
@@ -38,51 +54,54 @@ export class HomeComponent implements OnInit {
 
         this.initChart('c');
       },
+      complete: () => {
+        this.loading = false;
+      }
     });
   }
 
   initChart(caseType: string) {
     // console.log("called");    
-    let datatable = [];
-    datatable.push(["Country", "Cases"]);
+    this.datatable = [];
+    // datatable.push(["Country", "Cases"]);
 
     this.globalData.forEach((cs) => {
       let value: number = 0;
       if (caseType == "c") {
-        if (cs.confirmed > 2500) {
+        if (cs.confirmed > 2000) {
           value = cs.confirmed;
         }
       }
       if (caseType == "a") {
-        if (cs.active > 2500) {
-          value = cs.active;
+        if (cs.active > 2000) {
+          value = cs.active;      
         }
       }
       if (caseType == "r") {
-        if (cs.recovered > 2500) {
+        if (cs.recovered > 2000) {
           value = cs.recovered;
         }
       }
       if (caseType == "d") {
-        if (cs.deaths > 2500) {
+        if (cs.deaths > 2000) {
           value = cs.deaths;
         }
       }
-      datatable.push([cs.country, value]);
+      this.datatable.push([cs.country, value]);
     });
 
-    this.pieChart = {
-      chartType: "PieChart",
-      dataTable: datatable,
-      //firstRowIsData: true,
-      options: { height: 500 },
-    };
-    this.columnChart = {
-      chartType: "ColumnChart",
-      dataTable: datatable,
-      //firstRowIsData: true,
-      options: { height: 500 },
-    };
+    // this.pieChart = {
+    //   chartType: "PieChart",
+    //   dataTable: this.datatable,
+    //   //firstRowIsData: true,
+    //   options: { height: 500 },
+    // };
+    // this.columnChart = {
+    //   chartType: "ColumnChart",
+    //   dataTable: this.datatable,
+    //   //firstRowIsData: true,
+    //   options: { height: 500 },
+    // };
   }
 
   updateChart(input: HTMLInputElement) {

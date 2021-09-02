@@ -45,7 +45,7 @@ export class CountriesComponent implements OnInit {
     ).subscribe(
       {
         complete: () => {
-          // this.updateValues('India')
+          this.updateValue('India')
           this.loading = false;
         }
       }

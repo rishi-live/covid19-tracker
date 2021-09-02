@@ -1,6 +1,6 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { map } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { DateWiseData } from '../models/date-wise-data';
 import { GlobalDataSummary } from '../models/global-data';
 
@@ -9,14 +9,30 @@ import { GlobalDataSummary } from '../models/global-data';
 })
 export class DataServiceService {
 
-  // full_date = new Date();
-  // date = setDate();
-  // month = new Date().getMonth() + 1;
-  // year = new Date().getFullYear();
-  private globalDataUrl = `https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/04-17-2020.csv`;
+  month;
+  year;
+  date;
+  // globalDataUrl1;
+  getDate(date: number) {
+    if (date < 10) {
+      return '0' + date;
+    }
+    return date;
+  }
+  private newUrl;
+  private globalDataUrl1 = `https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/04-17-2020.csv`;
   private dateWiseDataUrl = `https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv`
-  
-  constructor(private http: HttpClient) { }
+  private extention = `.csv`;
+  constructor(private http: HttpClient) {
+
+    let full_date = new Date();
+    this.year = full_date.getFullYear();
+    this.month = new Date().getMonth() + 1;
+    this.date = new Date().getDate();
+    // this.globalDataUrl1 = `${this.globalDataUrl}${this.getDate(this.month)}-${this.getDate(this.date - 1)}-${this.year}${this.extention}`;
+    // console.log(this.globalDataUrl1, "first");
+
+  }
 
   getDateWiseData() {
     return this.http.get(this.dateWiseDataUrl, { responseType: 'text' })
@@ -51,32 +67,29 @@ export class DataServiceService {
             let dw: DateWiseData = {
               cases: +value,
               country: con,
-              date: new Date( Date.parse(dates[index]))
+              date: new Date(Date.parse(dates[index]))
             }
             mainData[con].push(dw)
           })
 
         })
         // console.log(mainData['India'], "llllllll");
-        
+
         return mainData;
-    }))
+      }))
   }
 
 
 
   getGlobalData() {
-    // console.log(this.date);
-    
-    return this.http.get(this.globalDataUrl, { responseType: 'text' }).pipe(
+    return this.http.get(this.globalDataUrl1, { responseType: 'text' }).pipe(
       map(result => {
-
         let data: GlobalDataSummary[] = [];
         let raw = {}
         let rows = result.split('\n');
-        rows.splice( 0 ,1 )
+        rows.splice(0, 1)
         rows.forEach(row => {
-          let cols = row.split(/,(?=\S)/);          
+          let cols = row.split(/,(?=\S)/);
           let cs = {
             country: cols[3],
             confirmed: +cols[7],
@@ -98,9 +111,18 @@ export class DataServiceService {
           }
 
         })
-        
-        return <GlobalDataSummary[]> Object.values(raw)
-      })
+
+        return <GlobalDataSummary[]>Object.values(raw)
+      }),
+      // catchError((error: HttpErrorResponse) => {
+      //   if (error.status == 404) {
+      //     this.date = this.date - 1;
+      //     this.newUrl = `${this.globalDataUrl}${this.getDate(this.month)}-${this.getDate(this.date - 1)}-${this.year}${this.extention}`;
+      //     // console.log(this.newUrl);
+      //     // return false
+      //     return this.getGlobalData();
+      //   }
+      // })
     )
   }
 }
