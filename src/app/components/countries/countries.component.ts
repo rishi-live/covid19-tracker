@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { GoogleChartInterface } from 'ng2-google-charts';
-import { DateWiseData } from 'src/app/models/date-wise-data';
-import { GlobalDataSummary } from 'src/app/models/global-data';
 import { DataServiceService } from 'src/app/services/data-service.service';
+import { GlobalDataSummary } from 'src/app/models/gloabal-data';
+import { DateWiseData } from 'src/app/models/date-wise-data';
 import { merge } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -13,94 +12,77 @@ import { map } from 'rxjs/operators';
 })
 export class CountriesComponent implements OnInit {
 
-  data: GlobalDataSummary[];
-  countries: String[] = [];
+  data : GlobalDataSummary[];
+  countries : string[] = [];
   totalConfirmed = 0;
   totalActive = 0;
   totalDeaths = 0;
   totalRecovered = 0;
+  selectedCountryData : DateWiseData[]; 
+  dateWiseData ;
   loading = true;
-
-  selectedCountryData: DateWiseData[];
-  dateWiseData: object;
-  lineChart: GoogleChartInterface = {
-    chartType: 'LineChart' 
+  options: {
+    height : 500, 
+    animation:{
+      duration: 1000,
+      easing: 'out',
+    },
   }
-  constructor( private service: DataServiceService ) { }
+ 
+  constructor(private service : DataServiceService) { }
 
   ngOnInit(): void {
-    
+
     merge(
       this.service.getDateWiseData().pipe(
-        map(result => {
+        map(result=>{
           this.dateWiseData = result;
         })
-      ),
-      this.service.getGlobalData().pipe(map(result => {
+      ), 
+      this.service.getGlobalData().pipe(map(result=>{
         this.data = result;
-        this.data.forEach(cs => {
+        this.data.forEach(cs=>{
           this.countries.push(cs.country)
         })
       }))
     ).subscribe(
       {
-        complete: () => {
-          this.updateValue('India')
-          this.loading = false;
+        complete : ()=>{
+         this.updateValues('India')
+         this.loading = false;
         }
       }
     )
+    
+    
 
-
-    // this.service.getGlobalData().subscribe(result => {
-    //   this.data = result;
-    //   this.data.forEach(cs => {
-    //     this.countries.push(cs.country);
-    //   })
-    // })
-    // this.service.getDateWiseData().subscribe(result => {
-    //   this.dateWiseData = result;
-    //   // console.log(typeof(result));
-      
-    //   // this.updateChart()
-    //   // console.log(result['Anhui']);
-    //   // console.log(this.dateWiseData['Anhui']);
-      
-    // })
   }
-  
-  updateChart() {
+
+  updateChart(){
     let dataTable = [];
-    dataTable.push(["Date", 'Cases'])
-    this.selectedCountryData.forEach(cs => {
-      dataTable.push([cs.date, cs.cases])
+    dataTable.push(["Date" , 'Cases'])
+    this.selectedCountryData.forEach(cs=>{
+      dataTable.push([cs.date , cs.cases])
     })
 
-    this.lineChart = {
-      chartType: "LineChart",
-      dataTable: dataTable,
-      //firstRowIsData: true,
-      options: { height: 500 },
-    };
+   
   }
 
-
-  updateValue( country: string ) {
-    // console.log(country);
-    this.data.forEach(cs => {
-      if (cs.country == country) {
-        this.totalConfirmed = cs.confirmed;
-        this.totalActive = cs.active;
-        this.totalDeaths = cs.deaths;
-        this.totalRecovered = cs.recovered;
+  updateValues(country : string){
+    console.log(country);
+    this.data.forEach(cs=>{
+      if(cs.country == country){
+        this.totalActive = cs.active
+        this.totalDeaths = cs.deaths
+        this.totalRecovered = cs.recovered
+        this.totalConfirmed = cs.confirmed
       }
     })
-    this.selectedCountryData = this.dateWiseData[country];
-    // console.log(this.dateWiseData[country]);
+
+    this.selectedCountryData  = this.dateWiseData[country]
+    // console.log(this.selectedCountryData);
+    this.updateChart();
     
-    this.updateChart()
-    // console.log(this.dateWiseData, country);
-        
   }
 
 }
