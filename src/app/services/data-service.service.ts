@@ -1,21 +1,16 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { map } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { map } from 'rxjs/operators'
+import { GlobalDataSummary } from '../models/gloabal-data';
 import { DateWiseData } from '../models/date-wise-data';
-import { GlobalDataSummary } from '../models/global-data';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DataServiceService {
 
-  // full_date = new Date();
-  // date = setDate();
-  // month = new Date().getMonth() + 1;
-  // year = new Date().getFullYear();
   private globalDataUrl = `https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/04-17-2020.csv`;
   private dateWiseDataUrl = `https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv`
-  
   constructor(private http: HttpClient) { }
 
   getDateWiseData() {
@@ -24,82 +19,78 @@ export class DataServiceService {
         let rows = result.split('\n');
         // console.log(rows);
         let mainData = {};
-        rows.splice(0, 1);
-
         let header = rows[0];
-        let dates = header.split(/,(?=\S)/);
+        let dates = header.split(/,(?=\S)/)
         dates.splice(0, 4);
-        rows.splice(0, 1);
 
+        let end_date = Object.keys(dates).length;
+        let start_date = (Object.keys(dates).length - 20);
+
+        let last_dates = dates.splice(start_date, end_date);
+        // console.log(last_dates);
+
+        rows.splice(0, 1);
         rows.forEach(row => {
-          let cols = row.split(/,(?=\S)/);
+
+
+          let cols = row.split(/,(?=\S)/)
           let con = cols[1];
           cols.splice(0, 4);
-          // let start = (cols.length - 30);
-          // let end = cols.length;
-          // if (start > 0) {
-
-          //   console.log(start, end);
-          //   for (let i:number = start, i:number <= end; i++){
-
-          //   }
-
-          // }
-
+          // console.log(con , cols);
           mainData[con] = [];
-          cols.forEach((value, index) => {
+          let start = (cols.length - 20);
+          // let end = cols.length;
+
+          let columns = cols.reverse();
+          columns.splice(-start);
+          // console.log(columns,"sliceeeee");
+          columns.reverse()
+          columns.forEach((value, index) => {
             let dw: DateWiseData = {
               cases: +value,
               country: con,
-              date: new Date( Date.parse(dates[index]))
+              date: new Date(Date.parse(last_dates[index]))
+
             }
             mainData[con].push(dw)
           })
-
         })
-        // console.log(mainData['India'], "llllllll");
-        
+        // console.log(mainData);
         return mainData;
-    }))
+      }))
   }
 
-
-
   getGlobalData() {
-    // console.log(this.date);
-    
     return this.http.get(this.globalDataUrl, { responseType: 'text' }).pipe(
       map(result => {
-
         let data: GlobalDataSummary[] = [];
         let raw = {}
         let rows = result.split('\n');
-        rows.splice( 0 ,1 )
+        rows.splice(0, 1);
+        // console.log(rows);
         rows.forEach(row => {
-          let cols = row.split(/,(?=\S)/);          
+          let cols = row.split(/,(?=\S)/)
+
           let cs = {
             country: cols[3],
             confirmed: +cols[7],
             deaths: +cols[8],
             recovered: +cols[9],
-            active: +cols[10]
-          }
-
+            active: +cols[10],
+          };
           let temp: GlobalDataSummary = raw[cs.country];
           if (temp) {
-            temp.active += cs.active
-            temp.confirmed += cs.confirmed
-            temp.deaths += cs.deaths
-            temp.recovered += cs.recovered
+            temp.active = cs.active + temp.active
+            temp.confirmed = cs.confirmed + temp.confirmed
+            temp.deaths = cs.deaths + temp.deaths
+            temp.recovered = cs.recovered + temp.recovered
 
             raw[cs.country] = temp;
           } else {
             raw[cs.country] = cs;
           }
-
         })
-        
-        return <GlobalDataSummary[]> Object.values(raw)
+        return <GlobalDataSummary[]>Object.values(raw);
       })
     )
   }
