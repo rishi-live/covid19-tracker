@@ -17,31 +17,31 @@ export class HomeComponent implements OnInit {
   globalData: GlobalDataSummary[];
   datatable = [];
   chart = {
-    PieChart : "PieChart" ,
-    ColumnChart : 'ColumnChart' ,
-    LineChart : "LineChart", 
-    height: 500, 
+    PieChart: "PieChart",
+    ColumnChart: 'ColumnChart',
+    LineChart: "LineChart",
+    height: 500,
     options: {
-      animation:{
+      animation: {
         duration: 1000,
         easing: 'out',
       },
       is3D: true
-    }  
+    }
   }
-  
-  
+
+
   constructor(private dataService: DataServiceService) { }
 
 
-  
+
   ngOnInit(): void {
 
     this.dataService.getGlobalData()
       .subscribe(
         {
           next: (result) => {
-            console.log(result);
+            // console.log(result);
             this.globalData = result;
             result.forEach(cs => {
               if (!Number.isNaN(cs.confirmed)) {
@@ -54,8 +54,8 @@ export class HomeComponent implements OnInit {
             })
 
             this.initChart('c');
-          }, 
-          complete : ()=>{
+          },
+          complete: () => {
             this.loading = false;
           }
         }
@@ -65,7 +65,7 @@ export class HomeComponent implements OnInit {
 
 
   updateChart(input: HTMLInputElement) {
-    console.log(input.value);
+    // console.log(input.value);
     this.initChart(input.value)
   }
 
@@ -73,30 +73,30 @@ export class HomeComponent implements OnInit {
 
     this.datatable = [];
     // this.datatable.push(["Country", "Cases"])
-    
+
     this.globalData.forEach(cs => {
-      let value :number ;
+      let value: number;
       if (caseType == 'c')
         if (cs.confirmed > 2000)
           value = cs.confirmed
-          
+
       if (caseType == 'a')
         if (cs.active > 2000)
           value = cs.active
       if (caseType == 'd')
         if (cs.deaths > 1000)
           value = cs.deaths
-          
+
       if (caseType == 'r')
         if (cs.recovered > 2000)
-            value = cs.recovered
-        
+          value = cs.recovered
 
-        this.datatable.push([
-            cs.country, value
-          ])
+
+      this.datatable.push([
+        cs.country, value
+      ])
     })
-    console.log(this.datatable);
+    // console.log(this.datatable);
 
   }
 

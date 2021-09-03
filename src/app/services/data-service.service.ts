@@ -21,27 +21,40 @@ export class DataServiceService {
         let mainData = {};
         let header = rows[0];
         let dates = header.split(/,(?=\S)/)
-        dates.splice(0 , 4);
-        rows.splice(0 , 1);
-        rows.forEach(row=>{
+        dates.splice(0, 4);
+
+        let end_date = Object.keys(dates).length;
+        let start_date = (Object.keys(dates).length - 20);
+
+        let last_dates = dates.splice(start_date, end_date);
+        // console.log(last_dates);
+
+        rows.splice(0, 1);
+        rows.forEach(row => {
+
+
           let cols = row.split(/,(?=\S)/)
           let con = cols[1];
-          cols.splice(0 , 4);
+          cols.splice(0, 4);
           // console.log(con , cols);
           mainData[con] = [];
-          cols.forEach((value , index)=>{
-            let dw : DateWiseData = {
-              cases : +value ,
-              country : con , 
-              date : new Date(Date.parse(dates[index])) 
+          let start = (cols.length - 20);
+          // let end = cols.length;
+
+          let columns = cols.reverse();
+          columns.splice(-start);
+          // console.log(columns,"sliceeeee");
+          columns.reverse()
+          columns.forEach((value, index) => {
+            let dw: DateWiseData = {
+              cases: +value,
+              country: con,
+              date: new Date(Date.parse(last_dates[index]))
 
             }
             mainData[con].push(dw)
           })
-          
         })
-
-
         // console.log(mainData);
         return mainData;
       }))
